@@ -1,27 +1,62 @@
 import { defineEventHandler, readBody } from 'h3'
-import { PDFDocument, rgb } from 'pdf-lib'
+import puppeteer from 'puppeteer'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const pdfDoc = await PDFDocument.create()
-  const page = pdfDoc.addPage([600, 800])
 
-  const { fromName, toName, date, situation, behavior, impact, strengths, improvements, finalMessage } = body
+  const {
+    fromName,
+    toName,
+    date,
+    situation,
+    behavior,
+    impact,
+    strengths,
+    improvements,
+    finalMessage
+  } = body
 
-  page.drawText(`Feedback`, { x: 50, y: 750, size: 20, color: rgb(0, 0, 0) })
-  page.drawText(`De: ${fromName}`, { x: 50, y: 720, size: 12 })
-  page.drawText(`Para: ${toName}`, { x: 50, y: 700, size: 12 })
-  page.drawText(`Data: ${date}`, { x: 50, y: 680, size: 12 })
-  page.drawText(`Situação: ${situation}`, { x: 50, y: 660, size: 12 })
-  page.drawText(`Comportamento: ${behavior}`, { x: 50, y: 640, size: 12 })
-  page.drawText(`Impacto: ${impact}`, { x: 50, y: 620, size: 12 })
-  page.drawText(`Pontos Fortes: ${strengths}`, { x: 50, y: 600, size: 12 })
-  page.drawText(`Melhorias: ${improvements}`, { x: 50, y: 580, size: 12 })
-  page.drawText(`Mensagem Final: ${finalMessage}`, { x: 50, y: 560, size: 12 })
+  const htmlContent = `
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { color: #333; }
+          p { margin: 6px 0; }
+        </style>
+      </head>
+      <body>
+        <h1>Feedback</h1>
+        <p><strong>De:</strong> ${fromName}</p>
+        <p><strong>Para:</strong> ${toName}</p>
+        <p><strong>Data:</strong> ${date}</p>
+        <p><strong>Situação:</strong> ${situation}</p>
+        <p><strong>Comportamento:</strong> ${behavior}</p>
+        <p><strong>Impacto:</strong> ${impact}</p>
+        <p><strong>Pontos Fortes:</strong> ${strengths}</p>
+        <p><strong>Melhorias:</strong> ${improvements}</p>
+        <p><strong>Mensagem Final:</strong> ${finalMessage}</p>
+      </body>
+    </html>
+  `
 
-  const pdfBytes = await pdfDoc.save()
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  })
+
+  const page = await browser.newPage()
+  await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
+
+  const pdfBuffer = await page.pdf({
+    format: 'A4',
+    printBackground: true,
+  })
+
+  await browser.close()
 
   event.node.res.setHeader('Content-Type', 'application/pdf')
-  event.node.res.setHeader('Content-Disposition', 'attachment; filename="feedback.pdf"')
-  return pdfBytes
+  event.node.res.setHeader('Content-Disposition', `attachment; filename="${toName}_feedback.pdf"`)
+  return pdfBuffer
 })
