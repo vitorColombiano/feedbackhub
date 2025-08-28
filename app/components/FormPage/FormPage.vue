@@ -1,8 +1,23 @@
 <script setup lang="ts">
 import { UButton, UForm, UFormField, UInput, UTextarea } from '#components'
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
+import * as v from 'valibot'
 
-const state = ref({
+const schema = v.object({
+  fromName: v.pipe(v.string(), v.minLength(1, 'Seu nome é obrigatório')),
+  toName: v.pipe(v.string(), v.minLength(1, 'O nome do destinatário é obrigatório')),
+  date: v.pipe(v.string(), v.minLength(1, 'A data é obrigatória')),
+  situation: v.pipe(v.string(), v.minLength(1, 'A situação é obrigatória')),
+  behavior: v.pipe(v.string(), v.minLength(1, 'O comportamento é obrigatório')),
+  impact: v.pipe(v.string(), v.minLength(1, 'O impacto é obrigatório')),
+  strengths: v.pipe(v.string(), v.minLength(1, 'Os pontos fortes são obrigatórios')),
+  improvements: v.pipe(v.string(), v.minLength(1, 'As melhorias são obrigatórias')),
+  finalMessage: v.pipe(v.string(), v.minLength(1, 'A mensagem final é obrigatória'))
+})
+
+type Schema = v.InferOutput<typeof schema>
+
+const state = reactive({
   fromName: '',
   toName: '',
   date: '',
@@ -14,30 +29,36 @@ const state = ref({
   finalMessage: ''
 })
 
-const schema = {
-  fromName: { required: true },
-  toName: { required: true },
-  date: { required: true },
-  situation: { required: true },
-  behavior: { required: true },
-  impact: { required: true },
-  strengths: { required: true },
-  improvements: { required: true },
-  finalMessage: { required: true }
-}
+const onSubmit = async (event: { data: Schema }) => {
+  console.log('Dados do formulário:', event.data)
+  
+  try {
+    console.log('Enviando requisição para /api/generate-pdf')
+    const response = await fetch('/api/generate-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(event.data)
+    })
 
-const onSubmit = () => {
-  alert('Feedback estruturado gerado com sucesso!')
-  state.value = {
-    fromName: '',
-    toName: '',
-    date: '',
-    situation: '',
-    behavior: '',
-    impact: '',
-    strengths: '',
-    improvements: '',
-    finalMessage: ''
+    console.log('Status da resposta:', response.status)
+    console.log('Response OK:', response.ok)
+
+    if (response.ok) {
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'feedback.pdf'
+      link.click()
+      window.URL.revokeObjectURL(url)
+      console.log('PDF gerado com sucesso!')
+    } else {
+      console.error('Erro ao gerar o PDF, status:', response.status)
+      const errorText = await response.text()
+      console.error('Mensagem de erro:', errorText)
+    }
+  } catch (error) {
+    console.error('Erro ao enviar os dados:', error)
   }
 }
 </script>
@@ -83,4 +104,3 @@ const onSubmit = () => {
     <UButton class="mt-4 p-3 text-xl mx-auto block" size="xl" label="Gerar Feedback" type="submit" />
   </UForm>
 </template>
-
