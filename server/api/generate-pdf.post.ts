@@ -3,12 +3,9 @@ import { PDFDocument, rgb } from 'pdf-lib'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-
-  // Crie um novo documento PDF
   const pdfDoc = await PDFDocument.create()
   const page = pdfDoc.addPage([600, 800])
 
-  // Adicione conteúdo ao PDF
   const { fromName, toName, date, situation, behavior, impact, strengths, improvements, finalMessage } = body
 
   page.drawText(`Feedback`, { x: 50, y: 750, size: 20, color: rgb(0, 0, 0) })
@@ -22,10 +19,8 @@ export default defineEventHandler(async (event) => {
   page.drawText(`Melhorias: ${improvements}`, { x: 50, y: 580, size: 12 })
   page.drawText(`Mensagem Final: ${finalMessage}`, { x: 50, y: 560, size: 12 })
 
-  // Gere o PDF como um buffer
   const pdfBytes = await pdfDoc.save()
 
-  // Retorne o PDF como resposta
   event.node.res.setHeader('Content-Type', 'application/pdf')
   event.node.res.setHeader('Content-Disposition', 'attachment; filename="feedback.pdf"')
   return pdfBytes

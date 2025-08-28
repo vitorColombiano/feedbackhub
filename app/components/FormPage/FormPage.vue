@@ -30,18 +30,12 @@ const state = reactive({
 })
 
 const onSubmit = async (event: { data: Schema }) => {
-  console.log('Dados do formulário:', event.data)
-  
   try {
-    console.log('Enviando requisição para /api/generate-pdf')
     const response = await fetch('/api/generate-pdf', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(event.data)
     })
-
-    console.log('Status da resposta:', response.status)
-    console.log('Response OK:', response.ok)
 
     if (response.ok) {
       const blob = await response.blob()
@@ -51,9 +45,7 @@ const onSubmit = async (event: { data: Schema }) => {
       link.download = 'feedback.pdf'
       link.click()
       window.URL.revokeObjectURL(url)
-      console.log('PDF gerado com sucesso!')
     } else {
-      console.error('Erro ao gerar o PDF, status:', response.status)
       const errorText = await response.text()
       console.error('Mensagem de erro:', errorText)
     }
