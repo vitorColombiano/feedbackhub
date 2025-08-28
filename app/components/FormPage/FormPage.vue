@@ -57,17 +57,19 @@ const onSubmit = async (event: { data: Schema }) => {
 
 <template>
   <UForm :schema="schema" :state="state" class="space-y-4 w-full" @submit="onSubmit">
-    <UFormField class="text-lg" label="Seu nome" name="fromName">
-      <UInput class="w-full" v-model="state.fromName" />
-    </UFormField>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <UFormField class="text-lg" label="Nome" name="fromName">
+        <UInput class="w-full" v-model="state.fromName" />
+      </UFormField>
 
-    <UFormField class="text-lg" label="Nome da pessoa que receberá o feedback" name="toName">
-      <UInput class="w-full" v-model="state.toName" />
-    </UFormField>
+      <UFormField class="text-lg" label="Destinatário" name="toName">
+        <UInput class="w-full" v-model="state.toName" />
+      </UFormField>
 
-    <UFormField class="text-lg" label="Data" name="date">
-      <UInput class="w-full" v-model="state.date" type="date" />
-    </UFormField>
+      <UFormField class="text-lg" label="Data" name="date">
+        <UInput class="w-full" v-model="state.date" type="date" />
+      </UFormField>
+    </div>
 
     <UFormField class="text-lg" label="Situação" name="situation">
       <UTextarea class="w-full" v-model="state.situation" />
