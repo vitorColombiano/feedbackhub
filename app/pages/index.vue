@@ -10,9 +10,8 @@
       <UButton
         class="p-3 text-2xl"
         label="Criar Feedback"
-        icon="i-lucide-sun"
+        icon="i-lucide-file"
         to="/form"
-        target="_blank"
       />
     </div>
   </div>

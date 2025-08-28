@@ -27,7 +27,6 @@ const schema = {
 }
 
 const onSubmit = () => {
-  console.log('Feedback gerado:', state.value)
   alert('Feedback estruturado gerado com sucesso!')
   state.value = {
     fromName: '',
@@ -44,44 +43,44 @@ const onSubmit = () => {
 </script>
 
 <template>
-  <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-    <UFormField label="Seu nome" name="fromName">
-      <UInput v-model="state.fromName" />
+  <UForm :schema="schema" :state="state" class="space-y-4 w-full" @submit="onSubmit">
+    <UFormField class="text-lg" label="Seu nome" name="fromName">
+      <UInput class="w-full" v-model="state.fromName" />
     </UFormField>
 
-    <UFormField label="Nome da pessoa que receberá o feedback" name="toName">
-      <UInput v-model="state.toName" />
+    <UFormField class="text-lg" label="Nome da pessoa que receberá o feedback" name="toName">
+      <UInput class="w-full" v-model="state.toName" />
     </UFormField>
 
-    <UFormField label="Data" name="date">
-      <UInput v-model="state.date" type="date" />
+    <UFormField class="text-lg" label="Data" name="date">
+      <UInput class="w-full" v-model="state.date" type="date" />
     </UFormField>
 
-    <UFormField label="Situação" name="situation">
-      <UTextarea v-model="state.situation" />
+    <UFormField class="text-lg" label="Situação" name="situation">
+      <UTextarea class="w-full" v-model="state.situation" />
     </UFormField>
 
-    <UFormField label="Comportamento observado" name="behavior">
-      <UTextarea v-model="state.behavior" />
+    <UFormField class="text-lg" label="Comportamento observado" name="behavior">
+      <UTextarea class="w-full" v-model="state.behavior" />
     </UFormField>
 
-    <UFormField label="Impacto gerado" name="impact">
-      <UTextarea v-model="state.impact" />
+    <UFormField class="text-lg" label="Impacto gerado" name="impact">
+      <UTextarea class="w-full" v-model="state.impact" />
     </UFormField>
 
-    <UFormField label="Pontos fortes" name="strengths">
-      <UTextarea v-model="state.strengths" />
+    <UFormField class="text-lg" label="Pontos fortes" name="strengths">
+      <UTextarea class="w-full" v-model="state.strengths" />
     </UFormField>
 
-    <UFormField label="O que pode melhorar" name="improvements">
-      <UTextarea v-model="state.improvements" />
+    <UFormField class="text-lg" label="O que pode melhorar" name="improvements">
+      <UTextarea class="w-full" v-model="state.improvements" />
     </UFormField>
 
-    <UFormField label="Mensagem final de incentivo" name="finalMessage">
-      <UTextarea v-model="state.finalMessage" />
+    <UFormField class="text-lg" label="Mensagem final de incentivo" name="finalMessage">
+      <UTextarea class="w-full" v-model="state.finalMessage" />
     </UFormField>
 
-    <UButton type="submit">Gerar Feedback</UButton>
+    <UButton class="mt-4 p-3 text-xl mx-auto block" size="xl" label="Gerar Feedback" type="submit" />
   </UForm>
 </template>
 
