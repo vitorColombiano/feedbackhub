@@ -21,4 +21,12 @@ export const routes: NuxtPage[] = [
       layout: false,
     },
   },
+  {
+    name: 'success',
+    path: '/success',
+    file: `${localPages}/success.vue`,
+    meta: {
+      layout: false,
+    },
+  }
 ]
