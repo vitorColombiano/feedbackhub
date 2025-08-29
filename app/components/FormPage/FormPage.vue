@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { UButton, UForm, UFormField, UInput, UTextarea } from '#components'
-import { ref, reactive } from 'vue'
 import * as v from 'valibot'
+import { reactive, watch } from 'vue'
+import type { Feedback } from '../../types/feedback'
+import { useFeedback } from '../../composables/useFeedback'
+import { UButton, UForm, UFormField, UInput, UTextarea } from '#components'
 
 const schema = v.object({
   fromName: v.pipe(v.string(), v.minLength(1, 'Seu nome é obrigatório')),
@@ -17,7 +19,9 @@ const schema = v.object({
 
 type Schema = v.InferOutput<typeof schema>
 
-const state = reactive({
+const { feedbackData, updateFeedback, generatePDF, clearFeedback, isLoading, error } = useFeedback()
+
+const state = reactive<Feedback>({
   fromName: '',
   toName: '',
   date: '',
@@ -29,33 +33,28 @@ const state = reactive({
   finalMessage: ''
 })
 
-const onSubmit = async (event: { data: Schema }) => {
-  try {
-    const response = await fetch('/api/generate-pdf', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(event.data)
-    })
+watch(feedbackData, (newData) => {
+  Object.assign(state, newData)
+}, { immediate: true, deep: true })
 
-    if (response.ok) {
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = 'feedback.pdf'
-      link.click()
-      window.URL.revokeObjectURL(url)
-    } else {
-      const errorText = await response.text()
-      console.error('Mensagem de erro:', errorText)
-    }
-  } catch (error) {
-    console.error('Erro ao enviar os dados:', error)
-  }
+watch(state, (newState) => {
+  updateFeedback(newState)
+}, { deep: true })
+
+const onSubmit = async (event: { data: Schema }) => {
+  await generatePDF(event.data)
+}
+
+const handleClear = () => {
+  clearFeedback()
 }
 </script>
 
 <template>
+  <div v-if="error" class="text-red-500 text-sm mt-2">
+    {{ error }}
+  </div>
+
   <UForm :schema="schema" :state="state" class="space-y-4 w-full" @submit="onSubmit">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <UFormField class="text-lg" label="Nome" name="fromName">
@@ -95,6 +94,24 @@ const onSubmit = async (event: { data: Schema }) => {
       <UTextarea class="w-full" v-model="state.finalMessage" />
     </UFormField>
 
-    <UButton class="mt-4 p-3 text-xl mx-auto block" size="xl" label="Gerar Feedback" type="submit" />
+    <div class="flex flex-col md:flex-row gap-4 mt-6">
+      <UButton
+        class="flex-1 p-3 text-xl mx-auto block"
+        size="xl"
+        label="Gerar Feedback"
+        type="submit"
+        :loading="isLoading"
+        :disabled="isLoading"
+      />
+      <UButton
+        class="flex-1 p-3 text-xl mx-auto block"
+        size="xl"
+        label="Limpar"
+        variant="outline"
+        color="neutral"
+        @click="handleClear"
+        :disabled="isLoading"
+      />
+    </div>
   </UForm>
 </template>
