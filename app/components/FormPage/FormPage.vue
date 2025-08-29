@@ -4,6 +4,7 @@ import { reactive, watch } from 'vue'
 import type { Feedback } from '../../types/feedback'
 import { useFeedback } from '../../composables/useFeedback'
 import { UButton, UForm, UFormField, UInput, UTextarea } from '#components'
+import { useRouter } from 'vue-router'
 
 const schema = v.object({
   fromName: v.pipe(v.string(), v.minLength(1, 'Seu nome é obrigatório')),
@@ -20,6 +21,7 @@ const schema = v.object({
 type Schema = v.InferOutput<typeof schema>
 
 const { feedbackData, updateFeedback, generatePDF, clearFeedback, isLoading, error } = useFeedback()
+const router = useRouter()
 
 const state = reactive<Feedback>({
   fromName: '',
@@ -42,7 +44,10 @@ watch(state, (newState) => {
 }, { deep: true })
 
 const onSubmit = async (event: { data: Schema }) => {
-  await generatePDF(event.data)
+  const success = await generatePDF(event.data);
+  if (success) {
+    router.push('/success');
+  }
 }
 
 const handleClear = () => {
