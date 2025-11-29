@@ -7,20 +7,19 @@ const feedback = ref<string>("")
 const feedbackList = ref<Feedbacks[]>([])
 const selectedType = ref<string>(feedbackOptions[0] ?? 'positive');
 
-const feedbackPositives = ref<Feedbacks[]>([]);
-const feedbackNegatives = ref<Feedbacks[]>([]);
+const feedbackPositives = computed(() =>
+  feedbackList.value.filter((item: Feedbacks) => item.type === 'positive')
+);
+
+const feedbackNegatives = computed(() =>
+  feedbackList.value.filter((item: Feedbacks) => item.type === 'negative')
+);
+
 const hasFeedbacks = computed(() => feedbackList.value.length > 0);
 
 function submitFeedback() {
   window.alert('O seu feedback foi registrado');
   feedbackList.value.push({ feedback: feedback.value, type: selectedType.value });
-
-  if (selectedType.value === 'positive') {
-    feedbackPositives.value.push({ feedback: feedback.value, type: selectedType.value });
-  } else if (selectedType.value === 'negative') {
-    feedbackNegatives.value.push({ feedback: feedback.value, type: selectedType.value });
-  }
-
   feedback.value = "";
 }
 </script>
