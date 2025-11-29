@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Feedbacks } from './types/Feedbacks';
-import { feedbackOptions } from './consts/feedbackOptions';
+import type { Feedbacks } from './types/Feedbacks';
+import type { feedbackOptions } from './consts/feedbackOptions';
 
 const feedback = ref<string>("")
 const feedbackList = ref<Feedbacks[]>([])
