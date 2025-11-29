@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { Feedbacks } from './types/Feedbacks';
-import type { feedbackOptions } from './consts/feedbackOptions';
+import { feedbackOptions } from './consts/feedbackOptions';
 
 const feedback = ref<string>("")
 const feedbackList = ref<Feedbacks[]>([])
-const selectedType = ref<string>(feedbackOptions[0]);
+const selectedType = ref<string>(feedbackOptions[0] ?? 'positive');
 
 const feedbackPositives = ref<Feedbacks[]>([]);
 const feedbackNegatives = ref<Feedbacks[]>([]);
